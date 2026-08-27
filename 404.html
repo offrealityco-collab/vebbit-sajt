@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>Vebbit</title>
+<meta name="robots" content="noindex">
+<script>
+/* Hash-router: /paket -> /#paket, allt annat -> startsidan */
+(function(){
+  var p=location.pathname.replace(/^\/+|\/+$/g,'').toLowerCase();
+  var kanda=['hem','paket','kunder','kontakt','villkor','integritet','cookies'];
+  location.replace('/' + (kanda.indexOf(p)>-1 ? '#'+p : ''));
+})();
+</script>
+<meta http-equiv="refresh" content="0;url=/">
+</head>
+<body style="background:#070F18"></body>
+</html>
