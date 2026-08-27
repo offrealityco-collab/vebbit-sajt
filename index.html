@@ -1133,6 +1133,25 @@ const LEGAL = {
     var btn=c.querySelector('.dcap__btn');
     if(btn){ btn.addEventListener('focus',go); btn.addEventListener('click',go); }
   });
+  /* kometAutostart: nar 01-kortet scrollas halvvags in i bild drar kometen
+     igang sekvensen sjalv. Utan detta star allt stilla tills besokaren rakar
+     hovra 01 - det fattar ingen. Hover tar som vanligt over nar den kommer,
+     och vakten ser till att en redan startad kedja inte dubblas. */
+  var autoStartad=false;
+  function kometAutostart(){
+    if(autoStartad) return; autoStartad=true;
+    if(!timer && !raf) timer=setTimeout(loop, 700);
+  }
+  if('IntersectionObserver' in window && caps[0]){
+    var io=new IntersectionObserver(function(poster){
+      for(var i=0;i<poster.length;i++){
+        if(poster[i].isIntersecting){ kometAutostart(); io.disconnect(); break; }
+      }
+    },{threshold:0.5});
+    io.observe(caps[0]);
+  } else {
+    kometAutostart();
+  }
   document.addEventListener('visibilitychange',function(){
     if(document.hidden && raf){ cancelAnimationFrame(raf); raf=0; }
   });
