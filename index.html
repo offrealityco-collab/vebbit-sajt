@@ -697,6 +697,29 @@ a:hover{color:var(--gold-light)}
 
 /* vebbit-rubriker: h1 ar semantik, inte utseende. Klassregler vinner. */
 h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
+
+/* webbit-text-stannar: en tand siffras text ligger kvar. Forut foll den bort
+   sa fort kometen flog vidare — man hann inte lasa den. */
+.dcap.is-open .dcap__info{opacity:1;transform:none}
+.dcap.is-open .dcap__rule{width:72px;opacity:.32}
+.dcap.is-on .dcap__rule{opacity:.65}
+
+/* webbit-tva-reviews: bada referenserna uppe samtidigt, lika breda, helt stilla.
+   Ersatter hover-vaxlingen (panelerna vaxte/krympte och texten byttes ut).
+   Bakgrunden ror jag INTE — panelerna ligger kvar direkt i rymden. */
+.obs-panel,.obs-panel.is-on{flex:1 1 0!important;opacity:1!important;cursor:default!important;
+  transition:none!important}
+.obs-panel .obs-wash{opacity:1!important;transition:none!important}
+.obs-panel{min-height:clamp(430px,54vh,520px)!important}
+.obs-panel .obs-content{opacity:1!important;transform:none!important;pointer-events:auto!important;
+  transition:none!important;width:auto;max-width:34ch;padding-left:4.2rem;align-self:start!important}
+/* planeten ner i hornet: texten toppjusteras sa de tva referenserna laser som ett par */
+.obs-panel .obs-planet{opacity:1!important;top:auto!important;bottom:4%!important;right:2%!important;
+  transform:none!important;transition:none!important;width:min(15vw,190px)!important}
+.obs-panel .obs-rail{opacity:1!important;transform:rotate(180deg)!important;
+  transition:none!important;animation:none!important}
+.obs-panel .obs-body{animation:none!important;box-shadow:0 25px 40px rgba(0,0,0,.45)!important}
+@media (max-width:820px){ .obs-panel .obs-content{width:100%;padding-left:2.5rem} }
 </style>
 </head>
 <body>
@@ -792,7 +815,7 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
       </div>
     </header>
     <section class="ku-obs">
-      <div class="obs-row"><button type="button" class="obs-panel obs--moon is-on" data-ref="0" aria-pressed="true"><span class="obs-wash" aria-hidden="true"></span><span class="obs-rail">Smart ID</span><span class="obs-planet" aria-hidden="true"><span class="obs-ring"><i class="obs-dot-a"></i><i class="obs-dot-b"></i></span><span class="obs-body"></span><span class="obs-band"></span></span><span class="obs-content"><span class="obs-meta"><span>01</span><span>Referens</span></span><p class="obs-quote">Vår första offert låg på 300 000 kronor och tre månaders väntan. Vebbit skickade en demo samma vecka, byggde hela sajten för en bråkdel av det, och svarar fortfarande inom en dag när vi hör av oss.</p><span class="obs-res"><strong>300 000 kronor blev en bråkdel.</strong><small>Samma ambition, utan sexsiffrig faktura.</small></span></span></button><button type="button" class="obs-panel obs--saturn" data-ref="1" aria-pressed="false"><span class="obs-wash" aria-hidden="true"></span><span class="obs-rail">Byfy Marketing</span><span class="obs-planet" aria-hidden="true"><span class="obs-ring"><i class="obs-dot-a"></i><i class="obs-dot-b"></i></span><span class="obs-body"></span><span class="obs-band"></span></span><span class="obs-content"><span class="obs-meta"><span>02</span><span>Referens</span></span><p class="obs-quote">Vi hann knappt skicka över materialet innan sajten låg uppe. Den ser dyrare ut än offerten vi tackat nej till, och vi äger den själva.</p><span class="obs-res"><strong>Live på en vecka.</strong><small>Ingen inlåsning, ingen överraskningsfaktura.</small></span></span></button></div>
+      <div class="obs-row"><div class="obs-panel obs--moon"><span class="obs-wash" aria-hidden="true"></span><span class="obs-rail">Smart ID</span><span class="obs-planet" aria-hidden="true"><span class="obs-ring"><i class="obs-dot-a"></i><i class="obs-dot-b"></i></span><span class="obs-body"></span><span class="obs-band"></span></span><span class="obs-content"><span class="obs-meta"><span>01</span><span>Referens</span></span><p class="obs-quote">Vår första offert låg på 300 000 kronor och tre månaders väntan. Vebbit skickade en demo samma vecka, byggde hela sajten för en bråkdel av det, och svarar fortfarande inom en dag när vi hör av oss.</p><span class="obs-res"><strong>300 000 kronor blev en bråkdel.</strong><small>Samma ambition, utan sexsiffrig faktura.</small></span></span></div><div class="obs-panel obs--saturn"><span class="obs-wash" aria-hidden="true"></span><span class="obs-rail">Byfy Marketing</span><span class="obs-planet" aria-hidden="true"><span class="obs-ring"><i class="obs-dot-a"></i><i class="obs-dot-b"></i></span><span class="obs-body"></span><span class="obs-band"></span></span><span class="obs-content"><span class="obs-meta"><span>02</span><span>Referens</span></span><p class="obs-quote">Vi hann knappt skicka över materialet innan sajten låg uppe. Den ser dyrare ut än offerten vi tackat nej till, och vi äger den själva.</p><span class="obs-res"><strong>Live på en vecka.</strong><small>Ingen inlåsning, ingen överraskningsfaktura.</small></span></span></div></div>
       <div class="next-row">
         <div><div class="eyebrow-gold">Nästa steg</div><p class="next-hl">Har du något på gång?</p></div>
         <a class="tlink" href="#kontakt" data-page="kontakt">Låt oss sätta det i rörelse <span class="arw" aria-hidden="true">&#8594;</span></a>
@@ -1008,6 +1031,7 @@ const LEGAL = {
       var arriving=(approach && approach.i===i)?approach.t:0;
       var hot=(hoverCap===i)||(activeCap===i)||arriving>0.55;
       c.classList.toggle('is-on', (hoverCap===i)||(activeCap===i));
+      c.classList.toggle('is-open', shown);
       if(!shown){
         ord.style.opacity='0'; ord.style.color='rgba(234,243,245,0)';
         ord.style.textShadow='none'; ord.style.animation='none';
@@ -1055,7 +1079,7 @@ const LEGAL = {
     c.y=Math.max(pad,Math.min(h-pad,c.y));
     var cx=c.x, cy=c.y;
     function at_(t){ var u=1-t; return {x:u*u*a.x+2*u*t*cx+t*t*b.x, y:u*u*a.y+2*u*t*cy+t*t*b.y}; }
-    var dur=1500+Math.min(700,dist*0.55), t0=performance.now(), myGen=++gen, arrived=false;
+    var dur=780+Math.min(360,dist*0.28), t0=performance.now(), myGen=++gen, arrived=false;
     function arrive(){
       if(arrived||myGen!==gen) return;
       arrived=true; approach=null; paint(); onArrive&&onArrive();
@@ -1355,26 +1379,8 @@ const LEGAL = {
 
 <script>
 
-/* Observatoriet: hover, focus och klick aktiverar. Vakt mot omrendering. */
-(function(){
-  var row=document.querySelector('.obs-row'); if(!row) return;
-  var panels=[].slice.call(row.querySelectorAll('.obs-panel'));
-  var open=0;
-  function activate(i){
-    if(open===i) return;            /* redan aktiv, gör inget */
-    open=i;
-    panels.forEach(function(p,j){
-      var on=j===i;
-      p.classList.toggle('is-on',on);
-      p.setAttribute('aria-pressed',on?'true':'false');
-    });
-  }
-  panels.forEach(function(p,i){
-    p.addEventListener('mouseenter',function(){activate(i);});
-    p.addEventListener('focus',function(){activate(i);});
-    p.addEventListener('click',function(){activate(i);});
-  });
-})();
+/* Observatoriet: referenserna ar statiska, bada syns samtidigt.
+   Hover-vaxlingen borttagen 2026-08-28 pa Torkels begaran. */
 
 </script>
 
