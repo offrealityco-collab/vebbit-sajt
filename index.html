@@ -1079,7 +1079,7 @@ const LEGAL = {
     c.y=Math.max(pad,Math.min(h-pad,c.y));
     var cx=c.x, cy=c.y;
     function at_(t){ var u=1-t; return {x:u*u*a.x+2*u*t*cx+t*t*b.x, y:u*u*a.y+2*u*t*cy+t*t*b.y}; }
-    var dur=780+Math.min(360,dist*0.28), t0=performance.now(), myGen=++gen, arrived=false;
+    var dur=400+Math.min(180,dist*0.14), t0=performance.now(), myGen=++gen, arrived=false;
     function arrive(){
       if(arrived||myGen!==gen) return;
       arrived=true; approach=null; paint(); onArrive&&onArrive();
