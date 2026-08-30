@@ -966,6 +966,30 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 /* Pa mobil vaxer chipsen till 44px tumyta via egen padding. Overlagrade
    tryckytor gar inte har: raderna ligger 6,4px isar och skulle overlappa. */
 @media (max-width:760px){ .ko-chip{padding:.73rem .8rem} .ko-chips{gap:.5rem} }
+
+/* webbit-rutnat-bort: sjokortets rutnat (.pk-l2/.pk-l3) syntes ENDAST som en
+   remsa mellan fyr-fotots underkant (792px) och .pk-stack:s klippning (900px).
+   .pk-stack ar viewport-hog med overflow:hidden, sa lagren kan aldrig na ner
+   till sjokortet dar en papperstextur hade hort hemma — jag provade att
+   forlanga dem och de klipptes bort. Ovanfor 792 tacker fotot dem helt.
+   Nettot av lagren var alltsa en flytande rektangel i skarven. Dolda.
+   Vill man ha tillbaka texturen maste .pk-stack sluta klippa och bli sidhog. */
+.pk-l2,.pk-l3{display:none}
+.pk-l3{
+  -webkit-mask-image:radial-gradient(66% 36% at 46% 60%,#000 10%,transparent 76%),
+                     linear-gradient(180deg,transparent 38%,#000 58%,#000 86%,transparent 99%);
+  mask-image:radial-gradient(66% 36% at 46% 60%,#000 10%,transparent 76%),
+             linear-gradient(180deg,transparent 38%,#000 58%,#000 86%,transparent 99%);
+  -webkit-mask-composite:source-in; mask-composite:intersect}
+
+/* webbit-panel-nedvanster: panelen ska ligga lagre och langre at vanster.
+   .ko-in har max-width:1120 + margin:auto, sa vansterkanten last vid 160px pa
+   en 1440-skarm. max-width:none slapper den ut till sidans standardpadding. */
+@media (min-width:821px){
+  .ko-in{max-width:none;padding-top:clamp(11rem,24vh,17rem);
+         padding-bottom:clamp(3.5rem,7vh,6rem);
+         padding-left:clamp(1.6rem,4vw,3.4rem)}
+}
 </style>
 </head>
 <body>
