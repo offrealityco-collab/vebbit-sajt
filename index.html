@@ -692,7 +692,8 @@ a:hover{color:var(--gold-light)}
   .brandmark{font-size:1.1rem}
   .tabs{gap:.72rem;flex-wrap:wrap}
   .tab{font-size:.82rem}
-  .topnav.solid{background:#070F18;border-bottom:1px solid rgba(255,255,255,.08)}
+  /* .topnav.solid borttagen: den solida raden gav en hard kant mot fotot.
+     Designens egen gradient tonar ut till noll och ar somlos. */
 }
 
 /* vebbit-rubriker: h1 ar semantik, inte utseende. Klassregler vinner. */
@@ -730,7 +731,8 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 
 /* ── 1a. Eyebrown krockade med navigationen: JS satter .solid pa alla
    bredder (se uppdatera()), men regeln fanns bara i mobil-media. ── */
-.topnav.solid{background:#070F18;border-bottom:1px solid rgba(255,255,255,.08)}
+/* .topnav.solid borttagen: den solida raden gav en hard kant mot fotot.
+     Designens egen gradient tonar ut till noll och ar somlos. */
 
 /* ── 1b. Diagonalen ar en diagonal. Var: 16% → 56% → 20% (zigzag, hogra
    tredjedelen tom). Nu: 0% → 35% → 70%, jamnt steg ner, hela bredden. ── */
@@ -948,6 +950,22 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 /* 🚨 Marginalen KOLLAPSAR mot .obs-row:s margin-bottom (72px) — det storsta
    vardet vinner, inte summan. Konstanten ar rakad efter det: linjen hamnar
    pa 348 + max(72, 31.4vw - 308) och maste na 0,3135*W + 40. */
+
+/* webbit-kompakt-kontakt: panelen tackte manen i videobakgrunden. Tightare
+   falt + borttagen svarstidsrad kortar den ~170px. Eftersom panelen ar
+   vertikalt centrerad flyttas overkanten NED, och manen blir fri. */
+/* 🚨 De vinnande reglerna ar .ko-panel-prefixade (0,2,0). Utan samma
+   prefix slar de mina oavsett ordning — forsta forsoket tog bara 34px. */
+.ko-panel{padding-bottom:1.4rem}
+.ko-panel .ko-field{gap:.26rem;padding:.58rem 0}
+.ko-panel .ko-field input{font-size:.95rem}
+.ko-panel .ko-send{margin-top:1rem;padding:.6rem 1.3rem;min-height:44px}
+.ko-disc{padding:.42rem 0}
+.ko-chips{gap:.4rem;padding-top:.3rem}
+.ko-chip{padding:.42rem .72rem;font-size:.78rem}
+/* Pa mobil vaxer chipsen till 44px tumyta via egen padding. Overlagrade
+   tryckytor gar inte har: raderna ligger 6,4px isar och skulle overlappa. */
+@media (max-width:760px){ .ko-chip{padding:.73rem .8rem} .ko-chips{gap:.5rem} }
 </style>
 </head>
 <body>
@@ -1089,7 +1107,7 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
           <input name="webbplats" id="cfHp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
           <button type="submit" class="ko-send">Skicka meddelande <span class="arw" aria-hidden="true">&#8594;</span></button>
         </form>
-        <div class="ko-when">Svarstid inom en dag &#183; Vardagar 9 till 17</div>
+        
       </div>
     </div>
   </section>
