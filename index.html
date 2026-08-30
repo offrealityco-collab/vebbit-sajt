@@ -919,6 +919,35 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 /* webbit-formularfel: samma barnstensfarg som modalens fel-lage */
 .ko-field input[aria-invalid="true"]{border-bottom-color:#E7A15A!important;border-bottom-width:2px}
 .ko-err{margin-top:.4rem;font-size:.78rem;color:#E7A15A;letter-spacing:.01em}
+
+/* webbit-chips-knapp: valen ligger bakom en knapp i stallet for att ligga
+   uppslagna. Samma etikettstil som faltens rubriker. */
+.ko-disc{display:flex;align-items:center;justify-content:space-between;gap:1rem;width:100%;
+  background:none;border:0;border-bottom:1px solid rgba(255,255,255,.2);
+  padding:.5rem 0;cursor:pointer;text-align:left;
+  font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(234,243,245,.7);transition:color .25s ease,border-color .3s ease}
+.ko-disc:hover,.ko-disc:focus-visible{color:var(--gold);border-bottom-color:var(--gold)}
+.ko-disc__i{position:relative;flex:0 0 auto;width:11px;height:11px}
+.ko-disc__i::before,.ko-disc__i::after{content:"";position:absolute;background:currentColor;
+  transition:transform .3s var(--ease),opacity .3s ease}
+.ko-disc__i::before{top:5px;left:0;width:11px;height:1px}
+.ko-disc__i::after{left:5px;top:0;width:1px;height:11px}
+.ko-disc[aria-expanded="true"] .ko-disc__i::after{transform:rotate(90deg);opacity:0}
+.ko-chips[hidden]{display:none}
+.ko-chips:not([hidden]){animation:fy-fade .32s ease both}
+.ko-disc__val{margin-left:auto;padding-right:.6rem;font-weight:400;letter-spacing:.04em;
+  text-transform:none;color:var(--gold);font-size:.74rem;
+  max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* webbit-streck-under-manen: .next-row har en hårlinje, och månen i sektionens
+   bakgrundsfoto ligger på 55,7 % av bildhöjden. Bakgrunden är cover, så månen
+   glider NEDÅT när fönstret blir bredare medan raden står stilla — linjen skar
+   rakt genom månen. Marginalen nedan följer samma vw-kurva som månen. */
+.ku-obs .next-row{margin-top:max(0px,calc(31.4vw - 308px))}
+/* 🚨 Marginalen KOLLAPSAR mot .obs-row:s margin-bottom (72px) — det storsta
+   vardet vinner, inte summan. Konstanten ar rakad efter det: linjen hamnar
+   pa 348 + max(72, 31.4vw - 308) och maste na 0,3135*W + 40. */
 </style>
 </head>
 <body>
@@ -1043,8 +1072,8 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
           <label class="ko-field"><span>E-post</span><input id="cfMail" name="epost" type="email" required maxlength="120" autocomplete="email" placeholder="din@epost.se"></label>
           <label class="ko-field"><span>Telefonnr <em>valfritt</em></span><input id="cfTel" name="telefon" type="tel" maxlength="30" autocomplete="tel" placeholder="Ditt nummer"></label>
           <label class="ko-field"><span>Företagsnamn <em>valfritt</em></span><input id="cfBolag" name="foretag" type="text" maxlength="120" autocomplete="organization" placeholder="Ditt företag"></label>
-          <div class="ko-field ko-field--chips"><span id="koVadLabel">Vad vill du ha hjälp med?</span>
-            <div class="ko-chips" role="group" aria-labelledby="koVadLabel">
+          <div class="ko-field ko-field--chips"><button type="button" class="ko-disc" id="koVadBtn" aria-expanded="false" aria-controls="koChips"><span id="koVadLabel">Vad behöver du hjälp med?</span><span class="ko-disc__i" aria-hidden="true"></span></button>
+            <div class="ko-chips" id="koChips" role="group" aria-labelledby="koVadLabel" hidden>
               <button type="button" class="ko-chip" aria-pressed="false">Standard hemsida</button>
               <button type="button" class="ko-chip" aria-pressed="false">Avancerad hemsida</button>
               <button type="button" class="ko-chip" aria-pressed="false">Webbshop</button>
@@ -1315,7 +1344,7 @@ const LEGAL = {
     c.y=Math.max(pad,Math.min(h-pad,c.y));
     var cx=c.x, cy=c.y;
     function at_(t){ var u=1-t; return {x:u*u*a.x+2*u*t*cx+t*t*b.x, y:u*u*a.y+2*u*t*cy+t*t*b.y}; }
-    var dur=250+Math.min(110,dist*0.08), t0=performance.now(), myGen=++gen, arrived=false;
+    var dur=420+Math.min(190,dist*0.14), t0=performance.now(), myGen=++gen, arrived=false;
     function arrive(){
       if(arrived||myGen!==gen) return;
       arrived=true; approach=null; paint(); onArrive&&onArrive();
@@ -1372,19 +1401,19 @@ const LEGAL = {
       if(to<=3){ if(revealed.indexOf(to-1)<0) revealed.push(to-1); activeCap=to-1; }
       aim=next(to)<=3?next(to)-1:-1; paint();
       /* kort uppehall mellan siffrorna, langre andhamtning nar varvet ar runt */
-      timer=setTimeout(loop, to>=STOPS?1400:420);
+      timer=setTimeout(loop, to>=STOPS?2000:900);
     });
   }
   /* Hovra en siffra: kometen byter kurs dit fran var den an ar. */
   function sendTo(to){
-    if(to===at){ if(!timer) timer=setTimeout(loop,340); return; }
+    if(to===at){ if(!timer) timer=setTimeout(loop,560); return; }
     if(timer){clearTimeout(timer);timer=0;}
     var from=at;
     run(from,to,function(){
       at=to;
       if(to<=3){ if(revealed.indexOf(to-1)<0) revealed.push(to-1); activeCap=to-1; }
       paint();
-      timer=setTimeout(loop,480);
+      timer=setTimeout(loop,820);
     });
   }
   caps.forEach(function(c,i){
@@ -1401,7 +1430,7 @@ const LEGAL = {
   var autoStartad=false;
   function kometAutostart(){
     if(autoStartad) return; autoStartad=true;
-    if(!timer && !raf) timer=setTimeout(loop, 260);
+    if(!timer && !raf) timer=setTimeout(loop, 430);
   }
   var autoMal=wrap.querySelector('.caps__diag')||caps[0];
   if('IntersectionObserver' in window && autoMal){
@@ -1934,12 +1963,30 @@ const LEGAL = {
 (function(){
   var box=document.querySelector('.ko-chips'); if(!box) return;
   var out=document.getElementById('cfMsg');
+  var knapp=document.getElementById('koVadBtn');
+  var etikett=document.getElementById('koVadLabel');
+  /* valen syns i knappen nar listan ar hopfalld, annars vet man inte vad man valt */
+  var visning=document.createElement('span'); visning.className='ko-disc__val';
+  if(etikett&&etikett.parentNode) etikett.parentNode.insertBefore(visning,etikett.nextSibling);
+  function uppdatera(){
+    var valda=[].slice.call(box.querySelectorAll('.ko-chip.is-on'))
+      .map(function(x){return x.textContent.trim();});
+    if(out) out.value=valda.join(', ');
+    var oppen=knapp&&knapp.getAttribute('aria-expanded')==='true';
+    visning.textContent = (!oppen&&valda.length)
+      ? (valda.length===1?valda[0]:valda.length+' valda') : '';
+  }
+  if(knapp) knapp.addEventListener('click',function(){
+    var oppen=knapp.getAttribute('aria-expanded')==='true';
+    knapp.setAttribute('aria-expanded', oppen?'false':'true');
+    box.hidden=oppen;
+    uppdatera();
+  });
   box.addEventListener('click',function(e){
     var b=e.target.closest('.ko-chip'); if(!b) return;
     b.classList.toggle('is-on');
     b.setAttribute('aria-pressed', b.classList.contains('is-on')?'true':'false');
-    if(out) out.value=[].slice.call(box.querySelectorAll('.ko-chip.is-on'))
-      .map(function(x){return x.textContent.trim();}).join(', ');
+    uppdatera();
   });
 })();
 </script>
