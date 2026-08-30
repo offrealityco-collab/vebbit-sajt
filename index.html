@@ -1441,21 +1441,24 @@ const LEGAL = {
     run(from,to,function(){
       at=to;
       if(to<=3){ if(revealed.indexOf(to-1)<0) revealed.push(to-1); activeCap=to-1; }
+      /* Rutten kors EN gang: 01 -> 02 -> 03 -> fast pris -> knappen, sen stannar
+         kometen. Ingen aterstallning till 01, inget nytt varv. */
+      if(to>=STOPS){ aim=-1; paint(); return; }
       aim=next(to)<=3?next(to)-1:-1; paint();
-      /* kort uppehall mellan siffrorna, langre andhamtning nar varvet ar runt */
-      timer=setTimeout(loop, to>=STOPS?2000:900);
+      timer=setTimeout(loop, 900);
     });
   }
   /* Hovra en siffra: kometen byter kurs dit fran var den an ar. */
   function sendTo(to){
-    if(to===at){ if(!timer) timer=setTimeout(loop,560); return; }
+    if(to===at) return;
     if(timer){clearTimeout(timer);timer=0;}
     var from=at;
     run(from,to,function(){
       at=to;
       if(to<=3){ if(revealed.indexOf(to-1)<0) revealed.push(to-1); activeCap=to-1; }
+      /* Hover flyttar kometen dit man pekar, men startar INTE om rutten.
+         Har den redan kort klart ska den sta stilla. */
       paint();
-      timer=setTimeout(loop,820);
     });
   }
   caps.forEach(function(c,i){
