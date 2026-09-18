@@ -1247,7 +1247,10 @@ const LEGAL = {
     });
     window.scrollTo(0,0);
   }
-  document.querySelectorAll('[data-page]').forEach(function(l){
+  /* 🚨 BARA lankar. Sektionerna har ocksa data-page (<section class="page" data-page="hem">),
+     och band man handlern pa dem bubblade knappklicket upp till sin egen sektion, som da
+     navigerade TILLBAKA dit man kom ifran. Knappen tog dig till #paket och kastade dig till #hem. */
+  document.querySelectorAll('a[data-page]').forEach(function(l){
     l.addEventListener('click',function(e){
       e.preventDefault();
       var id=l.getAttribute('data-page');
@@ -1718,14 +1721,28 @@ const LEGAL = {
   function active(){ return page.classList.contains('active'); }
   var dpr=Math.min(devicePixelRatio||1,1.75);
   function cover(){ var w=hero.clientWidth||innerWidth,h=hero.clientHeight||innerHeight; var s=Math.max(w/SW,h/SH);
-    return {s:s,ox:(w-SW*s)/2,oy:(h-SH*s)/2,w:w,h:h}; }
+    /* 🚨 oy=0, INTE (h-SH*s)/2. Fotot ligger med object-position:center top, alltsa
+       overkant mot overkant. Den centrerade formeln la allt vi ritar ovanpa ~50px for
+       hogt: WebGL-manen hamnade ovanfor fotots mane (som stack ut nedtill) och
+       ringpartiklarna svavade ovanfor Saturnus ring. Horisontellt ar center korrekt. */
+    return {s:s,ox:(w-SW*s)/2,oy:0,w:w,h:h}; }
 
   /* Saturn rings - orbiting particles */
   (function(){ if(reduce) return; var ctx=ringCv.getContext('2d');
     function wW(){return Math.floor((hero.clientWidth||innerWidth)*dpr);} function wH(){return Math.floor((hero.clientHeight||innerHeight)*dpr);}
     function fit(){ringCv.width=wW();ringCv.height=wH();} fit(); addEventListener('resize',fit);
-    var P=[]; for(var i=0;i<520;i++){ var rf=0.5+Math.random()*0.52; if(rf>0.79&&rf<0.85){i--;continue;}
-      P.push({rf:rf,th:Math.random()*Math.PI*2,sp:(0.055+0.02*Math.random())/Math.sqrt(rf),br:0.25+Math.random()*0.5,band:(rf<0.79?1:0.72)});}
+    /* Jamn TATHET langs ellipsen pa skarmen. Drar man theta likformigt klumpar allt
+       ihop sig vid ringens tva spetsar, for dar ar ds/dtheta som minst - det sag ut
+       som en grushog i vanstra kanten i stallet for en ring. Rejektionssampling mot
+       ds/dtheta = sqrt(sin^2 + (b/a)^2 cos^2) ger jamn fordelning. */
+    var BA=SAT.b/SAT.a;
+    function jamnVinkel(){ for(var n=0;n<24;n++){ var t=Math.random()*Math.PI*2;
+      var st=Math.sin(t),ct=Math.cos(t);
+      if(Math.random()<Math.sqrt(st*st+BA*BA*ct*ct)) return t; } return Math.random()*Math.PI*2; }
+    /* Farten var keplersk men ~80 s per varv - i praktiken omarkbar. x2,8 gor att
+       ringen syns rotera utan att det blir en karusell (~34 s per varv). */
+    var P=[]; for(var i=0;i<700;i++){ var rf=0.5+Math.random()*0.52; if(rf>0.79&&rf<0.85){i--;continue;}
+      P.push({rf:rf,th:jamnVinkel(),sp:(0.155+0.055*Math.random())/Math.sqrt(rf),br:0.22+Math.random()*0.45,band:(rf<0.79?1:0.72)});}
     var last=null;
     function loop(now){ requestAnimationFrame(loop);
       if(!active()||document.hidden){ last=null; return; } if(last==null) last=now; var dt=(now-last)/1000; last=now;
