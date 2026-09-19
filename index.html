@@ -1005,14 +1005,17 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
    fritext (chipsvaljaren ar borta), knappen en fylld guldpille med glod, och
    under den tre trygghetsrader. Sist i mallen — .ko-panel-prefix dar det
    behovs, annars slar de aldre reglerna (0,2,0) oavsett ordning. ══ */
-.ko-in > .ko-panel,.ko-panel{
+/* 🚨 .ko-panel.ko-panel, inte bara .ko-panel: den aldre regeln
+   .ko-in > div:first-child{padding-top:0} ar (0,2,1) och vinner over (0,2,0)
+   oavsett ordning. Kortet stod utan toppluft — det syntes inte sa lange en
+   eyebrow med egen radhojd lag overst, men rubriken klistrades mot kanten. */
+.ko-in > .ko-panel.ko-panel,.ko-panel{
   width:min(680px,100%);
   padding:clamp(1.7rem,3vw,2.6rem) clamp(1.5rem,2.6vw,2.4rem) clamp(1.5rem,2.4vw,2.1rem);
   border:1px solid rgba(255,255,255,.10);border-radius:26px;
   background:linear-gradient(158deg,rgba(11,20,31,.86),rgba(5,10,17,.80));
   -webkit-backdrop-filter:blur(18px) saturate(115%);backdrop-filter:blur(18px) saturate(115%);
   box-shadow:0 50px 120px -55px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.06)}
-.ko-panel .eyebrow-gold{margin-bottom:.55rem}
 .ko-h1{margin:0 0 .7rem;font-family:'Hanken','Hanken Grotesk',system-ui,sans-serif;font-weight:700;
   font-size:clamp(1.9rem,3.5vw,2.55rem);line-height:1.08;letter-spacing:-.025em;color:#fff}
 .ko-lead2{margin:0 0 clamp(1.25rem,2.3vw,1.75rem);max-width:48ch;
@@ -1075,12 +1078,29 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 @media (min-width:821px){
   .ko-in{padding-top:clamp(6.5rem,11vh,8.5rem);padding-bottom:clamp(3.5rem,7vh,6rem)}
 }
-@media (max-width:820px){ .ko-in > .ko-panel,.ko-panel{width:100%;border-radius:20px} }
+@media (max-width:820px){ .ko-in > .ko-panel.ko-panel,.ko-panel{width:100%;border-radius:20px} }
 @media (max-width:620px){
   .ko-trust{grid-template-columns:1fr;gap:.68rem}
   .ko-trust li+li{padding-left:0;border-left:0}
   /* <br> far sta kvar: doljer man den klistras 'information' och 'ar' ihop. */
 }
+
+/* ══ webbit-modal v2: valraden är inte längre en tjänsteväljare. Tjänsten
+   bestäms av knappen man kom från, och supporten är ett tillägg man lägger
+   till ovanpå. Att låta den som klickat "Begär offert" välja "Hemsida
+   7 500 kr" var att erbjuda fel sak, och att välja supporten slog ut
+   offerten helt — man kunde inte ha båda. ══ */
+.co-opt--main{cursor:default}
+.co-opt--main::after{transform:scaleX(1)}
+.co-opt-add{margin-top:.34rem;display:inline-flex;align-items:center;gap:.34rem;
+  font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(231,190,90,.85);transition:color .3s ease}
+.co-opt-add::before{content:"+";font-size:1rem;line-height:.9;font-weight:400}
+.co-opt--addon:hover .co-opt-add,.co-opt--addon:focus-visible .co-opt-add{color:var(--gold-light)}
+.co-opt--addon.is-on .co-opt-add{color:#EAF3F5}
+.co-opt--addon.is-on .co-opt-add::before{content:"\2713";font-size:.82rem}
+/* .co-opt sätter display:flex, vilket slår webbläsarens egen [hidden]-regel */
+.co-opt--addon[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -1199,7 +1219,6 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
     <div class="ko-bloom" aria-hidden="true"></div>
     <div class="ko-in">
       <div class="ko-panel">
-        <p class="eyebrow-gold">Kontakta oss</p>
         <h1 class="ko-h1">Vi hj&auml;lper dig g&auml;rna</h1>
         <p class="ko-lead2">Har du fr&aring;gor, beh&ouml;ver support eller vill veta mer om v&aring;ra tj&auml;nster? Fyll i formul&auml;ret s&aring; &aring;terkommer vi s&aring; snart som m&ouml;jligt.</p>
         <form class="ko-form" id="contactForm" novalidate>
@@ -1920,10 +1939,16 @@ const LEGAL = {
       <div class="co-eyebrow" id="coKicker">Best&auml;llning</div>
       <h3 id="coTitle">Best&auml;ll din hemsida</h3>
       <p class="co-sub">Du binder dig inte h&auml;r. Vi bekr&auml;ftar omfattning och pris innan vi startar och innan n&aring;gon faktura skickas.</p>
-      <div class="co-pick" role="group" aria-label="V&auml;lj tj&auml;nst">
-        <button type="button" class="co-opt is-on" data-pick="hemsida" aria-pressed="true"><span class="co-opt-name">Hemsida</span><span class="co-opt-price">7 500 kr</span></button>
-        <button type="button" class="co-opt" data-pick="support" aria-pressed="false"><span class="co-opt-name">Support &amp; &auml;ndringar</span><span class="co-opt-price">999 kr/m&aring;n</span></button>
-        <button type="button" class="co-opt" data-pick="offert" aria-pressed="false"><span class="co-opt-name">Mer kraft</span><span class="co-opt-price">Offert</span></button>
+      <div class="co-pick">
+        <div class="co-opt co-opt--main is-on">
+          <span class="co-opt-name" id="coMainName">Hemsida</span>
+          <span class="co-opt-price" id="coMainPrice">7 500 kr</span>
+        </div>
+        <button type="button" class="co-opt co-opt--addon" id="coAddon" aria-pressed="false">
+          <span class="co-opt-name">Support &amp; &auml;ndringar</span>
+          <span class="co-opt-price">999 kr/m&aring;n</span>
+          <span class="co-opt-add" id="coAddonHint">L&auml;gg till</span>
+        </button>
       </div>
       <form class="co-form" id="coForm" novalidate>
         <div class="co-grid">
@@ -1940,7 +1965,7 @@ const LEGAL = {
         <div class="co-err" id="coErr" aria-live="polite"></div>
         <button type="submit" class="co-send">Skicka best&auml;llning <span class="arw" aria-hidden="true">&#8594;</span></button>
       </form>
-      <p class="co-fine">Genom att skicka godk&auml;nner du v&aring;ra <a href="#villkor" data-page="villkor" data-co-close>anv&auml;ndarvillkor</a>. Betalning sker mot faktura efter att vi bekr&auml;ftat best&auml;llningen. Inga kort- eller bankuppgifter l&auml;mnas h&auml;r.</p>
+      <p class="co-fine">Genom att skicka godk&auml;nner du v&aring;ra <a href="#villkor" data-page="villkor" data-co-close>anv&auml;ndarvillkor</a>. Betalning sker mot faktura efter att vi bekr&auml;ftat uppdraget. Inga kort- eller bankuppgifter l&auml;mnas h&auml;r.</p>
     </div>
     <div id="coStep2" class="co-ok" hidden>
       <div class="co-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
@@ -1967,30 +1992,49 @@ const LEGAL = {
       mailLink=document.getElementById('coMailLink'),
       sendBtn=form.querySelector('.co-send');
 
-  var PACKAGES={
+  /* Tjansten bestams av knappen man kom fran - man byter den inte har inne.
+     Att visa "Hemsida 7 500 kr" for nagon som klickat Begar offert var fel
+     erbjudande. Support ar i stallet ett TILLAGG som kan laggas ovanpa bade
+     hemsida och offert. */
+  var TJANST={
     hemsida:{item:'Hemsida, engångspris',amount:'7 500 kr exkl. moms',
-             title:'Beställ din hemsida',kicker:'Beställning',cta:'Skicka beställning'},
-    support:{item:'Support & ändringar',amount:'999 kr per månad exkl. moms',
-             title:'Lägg till Support & ändringar',kicker:'Beställning',cta:'Skicka beställning'},
+             namn:'Hemsida',pris:'7 500 kr',
+             title:'Beställ din hemsida',kicker:'Beställning',cta:'Skicka beställning',offert:false},
     offert: {item:'Mer kraft, skräddarsytt',amount:'Offert före start',
-             title:'Begär offert',kicker:'Offertförfrågan',cta:'Skicka förfrågan'}
+             namn:'Mer kraft',pris:'Offert',
+             title:'Begär offert',kicker:'Offertförfrågan',cta:'Begär offert',offert:true},
+    support:{item:'Support & ändringar',amount:'999 kr per månad exkl. moms',
+             namn:'Support & ändringar',pris:'999 kr/mån',
+             title:'Lägg till Support & ändringar',kicker:'Beställning',cta:'Skicka beställning',offert:false}
   };
-  var current=PACKAGES.hemsida, currentKey='hemsida', lastFocus=null;
+  var TILLAGG={item:'Support & ändringar',amount:'999 kr per månad exkl. moms'};
+  var mainName=document.getElementById('coMainName'),
+      mainPrice=document.getElementById('coMainPrice'),
+      addonBtn=document.getElementById('coAddon'),
+      addonHint=document.getElementById('coAddonHint');
+  var current=TJANST.hemsida, currentKey='hemsida', harTillagg=false, lastFocus=null;
 
-  function paint(key){
-    currentKey=key; current=PACKAGES[key]||PACKAGES.hemsida;
+  function paint(){
+    current=TJANST[currentKey]||TJANST.hemsida;
     titleEl.textContent=current.title;
     if(kickerEl) kickerEl.textContent=current.kicker;
     if(sendBtn && sendBtn.firstChild && sendBtn.firstChild.nodeType===3)
       sendBtn.firstChild.nodeValue=current.cta+' ';
-    document.querySelectorAll('.co-opt').forEach(function(b){
-      var on=b.getAttribute('data-pick')===key;
-      b.classList.toggle('is-on',on);
-      b.setAttribute('aria-pressed',on?'true':'false');
-    });
+    mainName.textContent=current.namn;
+    mainPrice.textContent=current.pris;
+    /* kom man via "Lagg till support" ar supporten sjalva bestallningen -
+       da finns inget tillagg att lagga till */
+    var visaTillagg=(currentKey!=='support');
+    addonBtn.hidden=!visaTillagg;
+    if(!visaTillagg) harTillagg=false;
+    addonBtn.classList.toggle('is-on',harTillagg);
+    addonBtn.setAttribute('aria-pressed',harTillagg?'true':'false');
+    addonHint.textContent=harTillagg?'Tillagd':'Lägg till';
   }
   function openCo(key){
-    paint(PACKAGES[key]?key:'hemsida');
+    currentKey=TJANST[key]?key:'hemsida';
+    harTillagg=false;
+    paint();
     step1.hidden=false; step2.hidden=true; errEl.textContent=''; form.reset();
     nameI.setAttribute('aria-invalid','false'); mailI.setAttribute('aria-invalid','false');
     lastFocus=document.activeElement;
@@ -2006,9 +2050,7 @@ const LEGAL = {
   document.querySelectorAll('[data-buy]').forEach(function(b){
     b.addEventListener('click',function(e){ e.preventDefault(); openCo(b.getAttribute('data-buy')); });
   });
-  document.querySelectorAll('.co-opt').forEach(function(b){
-    b.addEventListener('click',function(){ paint(b.getAttribute('data-pick')); });
-  });
+  addonBtn.addEventListener('click',function(){ harTillagg=!harTillagg; paint(); });
   closeBtn.addEventListener('click',closeCo);
   overlay.addEventListener('click',function(e){ if(e.target===overlay) closeCo(); });
   overlay.querySelectorAll('[data-co-close]').forEach(function(a){ a.addEventListener('click',closeCo); });
@@ -2042,10 +2084,13 @@ const LEGAL = {
     if(!valid()) return;
     var n=nameI.value.trim().slice(0,80), c=compI.value.trim().slice(0,90),
         m=mailI.value.trim(), p=phoneI.value.trim().slice(0,30);
-    var arende=(currentKey==='offert'?'Offertförfrågan: ':'Beställning: ')+current.item;
+    var arende=(current.offert?'Offertförfrågan: ':'Beställning: ')+current.item
+      +(harTillagg?' + '+TILLAGG.item:'');
+    var rader='- '+current.item+'\n- '+current.amount+'\n'
+      +(harTillagg?'- Tillägg: '+TILLAGG.item+', '+TILLAGG.amount+'\n':'');
     var body='Hej Vebbit!\n\n'
-      +(currentKey==='offert'?'Jag vill ha en offert på:':'Jag vill beställa:')+'\n'
-      +'- '+current.item+'\n- '+current.amount+'\n\nMina uppgifter:\n'
+      +(current.offert?'Jag vill ha en offert på:':'Jag vill beställa:')+'\n'
+      +rader+'\nMina uppgifter:\n'
       +'- Namn: '+n+'\n'+(c?'- Företag: '+c+'\n':'')+'- E-post: '+m+'\n'+(p?'- Telefon: '+p+'\n':'')
       +'\nVänliga hälsningar,\n'+n;
     mailLink.setAttribute('href','mailto:support@vebbit.se?subject='+encodeURIComponent(arende)
