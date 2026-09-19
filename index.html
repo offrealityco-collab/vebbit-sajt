@@ -1101,6 +1101,67 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 .co-opt--addon.is-on .co-opt-add::before{content:"\2713";font-size:.82rem}
 /* .co-opt sätter display:flex, vilket slår webbläsarens egen [hidden]-regel */
 .co-opt--addon[hidden]{display:none}
+
+/* ══ webbit-tjansteval: rullgardin med tillaggstjanster i modalen. Valen
+   blir chips till hoger om knappen. Kryssar man i nagot i hemsideflodet
+   blir det en offertforfragan i stallet for en order pa fast pris — annars
+   hade det sett ut som om webbshop och CRM ingick i 7 500 kr. ══ */
+.co-svc{position:relative;display:grid;gap:.3rem}
+.co-svc[hidden]{display:none}
+.co-svc__lb{font-size:.66rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(234,243,245,.48);transition:color .3s ease}
+.co-svc__btn{display:flex;align-items:center;justify-content:space-between;gap:1rem;width:100%;
+  background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.2);border-radius:0;
+  padding:.42rem 0 .5rem;cursor:pointer;font:inherit;font-size:1rem;color:var(--paper);
+  text-align:left;transition:border-color .3s ease}
+.co-svc__btn:hover{border-color:rgba(255,255,255,.32)}
+.co-svc__btn[aria-expanded="true"]{border-color:var(--gold)}
+.co-svc__btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.co-svc__val{color:rgba(234,243,245,.34);transition:color .3s ease}
+.co-svc.har-val .co-svc__val{color:var(--paper)}
+.co-svc.har-val .co-svc__lb{color:rgba(231,190,90,.9)}
+.co-svc__chev{flex:0 0 auto;width:8px;height:8px;color:rgba(234,243,245,.5);
+  border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
+  transform:rotate(45deg) translate(-2px,-2px);
+  transition:transform .3s var(--ease),color .3s ease}
+.co-svc__btn[aria-expanded="true"] .co-svc__chev{transform:rotate(-135deg) translate(-2px,-2px);color:var(--gold)}
+.co-svc__panel{position:absolute;left:0;right:0;top:calc(100% + .55rem);z-index:6;
+  max-height:min(38vh,242px);overflow:auto;padding:.4rem;
+  background:#0A121C;border:1px solid rgba(255,255,255,.13);border-radius:13px;
+  box-shadow:0 34px 76px -34px rgba(0,0,0,.96);display:grid;gap:1px;
+  animation:fy-fade .22s ease both}
+.co-svc__panel[hidden]{display:none}
+.co-svc__row{position:relative;display:flex;align-items:center;gap:.72rem;
+  padding:.56rem .7rem;border-radius:9px;cursor:pointer;transition:background-color .2s ease}
+.co-svc__row:hover{background:rgba(255,255,255,.05)}
+.co-svc__row input{position:absolute;width:1px;height:1px;opacity:0;margin:0}
+.co-svc__box{flex:0 0 auto;width:17px;height:17px;border:1px solid rgba(255,255,255,.26);
+  border-radius:5px;display:grid;place-items:center;
+  transition:background-color .2s ease,border-color .2s ease}
+.co-svc__box::after{content:"";width:9px;height:5px;opacity:0;
+  border-left:1.7px solid var(--night);border-bottom:1.7px solid var(--night);
+  transform:rotate(-45deg) translateY(-1px) scale(.5);
+  transition:opacity .18s ease,transform .18s var(--ease)}
+.co-svc__row input:checked ~ .co-svc__box{background:var(--gold);border-color:var(--gold)}
+.co-svc__row input:checked ~ .co-svc__box::after{opacity:1;transform:rotate(-45deg) translateY(-1px) scale(1)}
+.co-svc__row input:focus-visible ~ .co-svc__box{outline:2px solid var(--gold);outline-offset:2px}
+.co-svc__name{font-size:.92rem;line-height:1.35;color:rgba(234,243,245,.82);transition:color .2s ease}
+.co-svc__row input:checked ~ .co-svc__name{color:#fff}
+
+.co-actions{display:flex;align-items:center;gap:.9rem 1.2rem;flex-wrap:wrap}
+.co-actions .co-send{margin:0;flex:0 0 auto}
+.co-chips{flex:1 1 200px;display:flex;flex-wrap:wrap;gap:.4rem;justify-content:flex-end;
+  list-style:none;margin:0;padding:0}
+.co-chip{display:inline-flex;align-items:center;gap:.42rem;padding:.3rem .48rem .3rem .64rem;
+  border:1px solid rgba(231,190,90,.38);border-radius:999px;background:rgba(231,190,90,.10);
+  font-size:.74rem;line-height:1.3;color:#F3E3BE;animation:fy-fade .26s ease both}
+.co-chip button{flex:0 0 auto;display:grid;place-items:center;width:15px;height:15px;padding:0;
+  border:0;border-radius:50%;background:rgba(231,190,90,.2);color:#F3E3BE;
+  font-size:.72rem;line-height:1;cursor:pointer;
+  transition:background-color .2s ease,color .2s ease}
+.co-chip button:hover{background:var(--gold);color:var(--night)}
+.co-chip button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (max-width:620px){ .co-chips{flex-basis:100%;justify-content:flex-start} }
 </style>
 </head>
 <body>
@@ -1951,6 +2012,14 @@ const LEGAL = {
         </button>
       </div>
       <form class="co-form" id="coForm" novalidate>
+        <div class="co-svc" id="coSvc" hidden>
+          <span class="co-svc__lb" id="coSvcLabel">Vad mer ska ing&aring;?</span>
+          <button type="button" class="co-svc__btn" id="coSvcBtn" aria-expanded="false" aria-controls="coSvcPanel">
+            <span class="co-svc__val" id="coSvcVal">V&auml;lj tj&auml;nster</span>
+            <span class="co-svc__chev" aria-hidden="true"></span>
+          </button>
+          <div class="co-svc__panel" id="coSvcPanel" role="group" aria-labelledby="coSvcLabel" hidden></div>
+        </div>
         <div class="co-grid">
           <p class="co-field"><label for="coName">Namn</label>
             <input id="coName" type="text" placeholder="F&ouml;r- och efternamn" autocomplete="name" maxlength="80" required aria-describedby="coErr"></p>
@@ -1963,7 +2032,10 @@ const LEGAL = {
         </div>
         <input type="text" id="coHp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;border:0;padding:0">
         <div class="co-err" id="coErr" aria-live="polite"></div>
-        <button type="submit" class="co-send">Skicka best&auml;llning <span class="arw" aria-hidden="true">&#8594;</span></button>
+        <div class="co-actions">
+          <button type="submit" class="co-send">Skicka best&auml;llning <span class="arw" aria-hidden="true">&#8594;</span></button>
+          <ul class="co-chips" id="coChips" aria-live="polite"></ul>
+        </div>
       </form>
       <p class="co-fine">Genom att skicka godk&auml;nner du v&aring;ra <a href="#villkor" data-page="villkor" data-co-close>anv&auml;ndarvillkor</a>. Betalning sker mot faktura efter att vi bekr&auml;ftat uppdraget. Inga kort- eller bankuppgifter l&auml;mnas h&auml;r.</p>
     </div>
@@ -2014,12 +2086,16 @@ const LEGAL = {
       addonHint=document.getElementById('coAddonHint');
   var current=TJANST.hemsida, currentKey='hemsida', harTillagg=false, lastFocus=null;
 
+  /* Har man kryssat i tjanster ar det inte langre en order pa fast pris —
+     da blir det en offertforfragan, och knappen sager det. */
+  function somOffert(){ return current.offert || valda.length>0; }
   function paint(){
     current=TJANST[currentKey]||TJANST.hemsida;
+    var offert=somOffert();
     titleEl.textContent=current.title;
-    if(kickerEl) kickerEl.textContent=current.kicker;
+    if(kickerEl) kickerEl.textContent=offert?'Offertförfrågan':current.kicker;
     if(sendBtn && sendBtn.firstChild && sendBtn.firstChild.nodeType===3)
-      sendBtn.firstChild.nodeValue=current.cta+' ';
+      sendBtn.firstChild.nodeValue=(offert?'Begär offert':current.cta)+' ';
     mainName.textContent=current.namn;
     mainPrice.textContent=current.pris;
     /* kom man via "Lagg till support" ar supporten sjalva bestallningen -
@@ -2030,10 +2106,17 @@ const LEGAL = {
     addonBtn.classList.toggle('is-on',harTillagg);
     addonBtn.setAttribute('aria-pressed',harTillagg?'true':'false');
     addonHint.textContent=harTillagg?'Tillagd':'Lägg till';
+    /* kom man via "Lagg till support" finns inget mer att lagga till */
+    var visaValjare=(currentKey!=='support');
+    if(svcWrap && svcWrap.hidden===visaValjare){
+      svcWrap.hidden=!visaValjare;
+      if(!visaValjare){ valda=[]; svcStang(); ritaVal(); }
+    }
   }
   function openCo(key){
     currentKey=TJANST[key]?key:'hemsida';
     harTillagg=false;
+    svcNollstall();
     paint();
     step1.hidden=false; step2.hidden=true; errEl.textContent=''; form.reset();
     nameI.setAttribute('aria-invalid','false'); mailI.setAttribute('aria-invalid','false');
@@ -2051,6 +2134,73 @@ const LEGAL = {
     b.addEventListener('click',function(e){ e.preventDefault(); openCo(b.getAttribute('data-buy')); });
   });
   addonBtn.addEventListener('click',function(){ harTillagg=!harTillagg; paint(); });
+
+  /* Tillaggstjanster: rullgardin -> chips bredvid knappen. */
+  var TJANSTER=['Webbshop','Bokningssystem','Skräddarsytt CRM-system','Chatbot & AI',
+    'Integrationer (API, affärssystem)','Flera språk','SEO & synlighet',
+    'Inloggning & medlemssidor','Annat'];
+  var svcWrap=document.getElementById('coSvc'), svcBtn=document.getElementById('coSvcBtn'),
+      svcVal=document.getElementById('coSvcVal'), svcPanel=document.getElementById('coSvcPanel'),
+      chipList=document.getElementById('coChips');
+  var valda=[];
+
+  TJANSTER.forEach(function(namn,i){
+    var rad=document.createElement('label'); rad.className='co-svc__row';
+    var kryss=document.createElement('input'); kryss.type='checkbox'; kryss.value=namn; kryss.id='coSvc'+i;
+    var box=document.createElement('span'); box.className='co-svc__box'; box.setAttribute('aria-hidden','true');
+    var txt=document.createElement('span'); txt.className='co-svc__name'; txt.textContent=namn;
+    rad.appendChild(kryss); rad.appendChild(box); rad.appendChild(txt);
+    kryss.addEventListener('change',function(){
+      if(kryss.checked){ if(valda.indexOf(namn)<0) valda.push(namn); }
+      else { var k=valda.indexOf(namn); if(k>-1) valda.splice(k,1); }
+      ritaVal(); paint();
+    });
+    svcPanel.appendChild(rad);
+  });
+
+  /* ritaVal ritar BARA chipsen och etiketten. paint() far anropa den, aldrig
+     tvartom — annars blir det en oandlig slinga mellan dem. */
+  function ritaVal(){
+    valda.sort(function(a,b){ return TJANSTER.indexOf(a)-TJANSTER.indexOf(b); });
+    svcWrap.classList.toggle('har-val',valda.length>0);
+    svcVal.textContent = valda.length===0 ? 'Välj tjänster'
+      : (valda.length===1 ? valda[0] : valda.length+' tjänster valda');
+    chipList.textContent='';
+    valda.forEach(function(namn){
+      var li=document.createElement('li'); li.className='co-chip';
+      var t=document.createElement('span'); t.textContent=namn; li.appendChild(t);
+      var x=document.createElement('button'); x.type='button'; x.textContent='\u00d7';
+      x.setAttribute('aria-label','Ta bort '+namn);
+      x.addEventListener('click',function(){
+        var k=valda.indexOf(namn); if(k>-1) valda.splice(k,1);
+        var j=TJANSTER.indexOf(namn); var ruta=document.getElementById('coSvc'+j);
+        if(ruta) ruta.checked=false;
+        ritaVal(); paint();
+      });
+      li.appendChild(x); chipList.appendChild(li);
+    });
+  }
+  function svcOppen(){ return svcBtn.getAttribute('aria-expanded')==='true'; }
+  function svcStang(){ svcBtn.setAttribute('aria-expanded','false'); svcPanel.hidden=true; }
+  function svcVaxla(){
+    var pa=!svcOppen();
+    svcBtn.setAttribute('aria-expanded',pa?'true':'false');
+    svcPanel.hidden=!pa;
+  }
+  function svcNollstall(){
+    valda=[];
+    TJANSTER.forEach(function(n,j){ var r=document.getElementById('coSvc'+j); if(r) r.checked=false; });
+    svcStang(); ritaVal();
+  }
+  svcBtn.addEventListener('click',svcVaxla);
+  /* Escape ska stanga rullgardinen forst, inte hela modalen. Capture-fasen pa
+     document kor fore modalens egen bubblande lyssnare pa samma nod. */
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape' && svcOppen()){ e.stopPropagation(); svcStang(); svcBtn.focus(); }
+  },true);
+  document.addEventListener('click',function(e){
+    if(svcOppen() && !svcWrap.contains(e.target)) svcStang();
+  });
   closeBtn.addEventListener('click',closeCo);
   overlay.addEventListener('click',function(e){ if(e.target===overlay) closeCo(); });
   overlay.querySelectorAll('[data-co-close]').forEach(function(a){ a.addEventListener('click',closeCo); });
@@ -2084,12 +2234,15 @@ const LEGAL = {
     if(!valid()) return;
     var n=nameI.value.trim().slice(0,80), c=compI.value.trim().slice(0,90),
         m=mailI.value.trim(), p=phoneI.value.trim().slice(0,30);
-    var arende=(current.offert?'Offertförfrågan: ':'Beställning: ')+current.item
-      +(harTillagg?' + '+TILLAGG.item:'');
+    var offert=somOffert();
+    var arende=(offert?'Offertförfrågan: ':'Beställning: ')+current.item
+      +(harTillagg?' + '+TILLAGG.item:'')
+      +(valda.length?' + '+valda.length+' tjänster':'');
     var rader='- '+current.item+'\n- '+current.amount+'\n'
-      +(harTillagg?'- Tillägg: '+TILLAGG.item+', '+TILLAGG.amount+'\n':'');
+      +(harTillagg?'- Tillägg: '+TILLAGG.item+', '+TILLAGG.amount+'\n':'')
+      +(valda.length?'\nSka också ingå:\n'+valda.map(function(v){return '- '+v;}).join('\n')+'\n':'');
     var body='Hej Vebbit!\n\n'
-      +(current.offert?'Jag vill ha en offert på:':'Jag vill beställa:')+'\n'
+      +(offert?'Jag vill ha en offert på:':'Jag vill beställa:')+'\n'
       +rader+'\nMina uppgifter:\n'
       +'- Namn: '+n+'\n'+(c?'- Företag: '+c+'\n':'')+'- E-post: '+m+'\n'+(p?'- Telefon: '+p+'\n':'')
       +'\nVänliga hälsningar,\n'+n;
