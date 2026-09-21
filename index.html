@@ -1727,31 +1727,9 @@ const LEGAL = {
   paint();
 })();
 
-/* PAKET · sjökortet: hover/focus/click a destination to light its leg of the route */
-(function(){
-  var chart=document.getElementById('fyChart'); if(!chart) return;
-  var P1=0.1255, P2=0.4385, P3=0.8735;
-  var lit=document.getElementById('routeLit');
-  var dests=[].slice.call(chart.querySelectorAll('.dest'));
-  var pips=[].slice.call(chart.querySelectorAll('.pip-wrap'));
-  var hot=false, active=0;
-  function seg(){ if(!hot) return {s:P1,l:0}; if(active===0) return {s:P1,l:P2-P1}; if(active===1) return {s:P2,l:P3-P2}; return {s:P1,l:P3-P1}; }
-  function render(){
-    chart.classList.toggle('hot',hot);
-    for(var i=0;i<dests.length;i++) dests[i].classList.toggle('is-on', hot&&i===active);
-    for(var k=0;k<pips.length;k++) pips[k].classList.toggle('is-on', hot&&k===active);
-    if(lit){ var g=seg(); lit.style.strokeDasharray=g.l+' '+(1-g.l); lit.style.strokeDashoffset=String(-g.s); lit.style.opacity=hot?'1':'0'; }
-  }
-  function setActive(i){ hot=true; active=i; render(); }
-  dests.forEach(function(d,i){
-    var btn=d.querySelector('.dest__btn');
-    d.addEventListener('mouseenter',function(){ setActive(i); });
-    if(btn){ btn.addEventListener('focus',function(){ setActive(i); }); btn.addEventListener('click',function(){ setActive(i); }); }
-    var cta=d.querySelector('.dest__cta'); if(cta) cta.addEventListener('focus',function(){ setActive(i); });
-  });
-  chart.addEventListener('mouseleave',function(){ hot=false; render(); });
-  render();
-})();
+/* Dubbletten av sjokortsskriptet borttagen 2026-09-21: den band egna
+   lyssnare pa samma element och holl ett eget hot/active som skrev over
+   det fristaende blockets tillstand. Nu finns bara en agare. */
 
 </script>
 
@@ -1913,12 +1891,57 @@ const LEGAL = {
   dests.forEach(function(d,i){
     var b=d.querySelector('.dest__btn');
     d.addEventListener('mouseenter',function(){setActive(i);});
-    d.addEventListener('touchstart',function(){setActive(i);},{passive:true});
     if(b){ b.addEventListener('focus',function(){setActive(i);}); b.addEventListener('click',function(){setActive(i);}); }
     var c=d.querySelector('.dest__cta'); if(c) c.addEventListener('focus',function(){setActive(i);});
   });
-  chart.addEventListener('mouseleave',function(){ hot=false; render(); });
+  /* Lamnar man sjokortet med musen ska vi inte slacka allt — vi ska tillbaka
+     till det scrollen sager. */
+  chart.addEventListener('mouseleave',function(){ franScroll(); });
+
+  /* ══ Scrolldriven tandning ══
+     Den punkt som ligger narmast lasraden tands och de andra slacks, sa man
+     slipper klicka for att texten ska lysa. Hover och fokus fungerar kvar.
+
+     Ankaret ar .dest__btn och inte hela .dest: pa desktop ar den tanda
+     punkten 409px hog medan de andra ar 146px, sa deras mittpunkter hamnar
+     18px fran varandra och "narmast mitten" blir instabilt. Knappen star
+     still i bada layouterna — pa desktop ar punkterna absolutpositionerade,
+     pa mobil ar infotexten alltid utfalld. */
+  var LASRAD=0.45;
+  function ankare(d){ return d.querySelector('.dest__btn') || d; }
+  function narmast(){
+    var mal=innerHeight*LASRAD, bast=0, bastAvst=Infinity;
+    for(var i=0;i<dests.length;i++){
+      var r=ankare(dests[i]).getBoundingClientRect();
+      var avst=Math.abs(r.top+r.height/2-mal);
+      if(avst<bastAvst){ bastAvst=avst; bast=i; }
+    }
+    return bast;
+  }
+  /* Tangentbordsfokus vinner over scrollen. .focus() scrollar dessutom in
+     elementet i bild, vilket triggar franScroll — utan den har vakten slog
+     scrollen genast tillbaka den punkt anvandaren just tabbat till. */
+  function fokuserad(){
+    var a=document.activeElement; if(!a) return -1;
+    for(var i=0;i<dests.length;i++) if(dests[i].contains(a)) return i;
+    return -1;
+  }
+  function franScroll(){
+    var f=fokuserad();
+    if(f>-1){ if(!hot||active!==f) setActive(f); return; }
+    var cr=chart.getBoundingClientRect();
+    /* Sjokortet ligger i en .page som doljs helt nar paketsidan inte ar
+       aktiv — da blir rect noll och vi slacker av oss sjalva. */
+    var inne = cr.height>0 && cr.bottom>innerHeight*0.12 && cr.top<innerHeight*0.88;
+    if(!inne){ if(hot){ hot=false; render(); } return; }
+    var i=narmast();
+    if(!hot || i!==active) setActive(i);
+  }
+  addEventListener('scroll',franScroll,{passive:true});
+  addEventListener('resize',franScroll);
+  addEventListener('hashchange',function(){ setTimeout(franScroll,80); });
   render();
+  franScroll();
 })();
 </script>
 
