@@ -1217,6 +1217,16 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 @media (max-width:760px){
   .ku-obs{background-position:26% top}
 }
+
+/* ══ webbit-nav-doljs-vid-scroll: menyn tonar bort nedat och kommer tillbaka
+   uppat, sa den genomskinliga raden aldrig skar genom rubriker. Lyftet pa
+   14px speglar fy-downs egna -10px sa in- och utgang hor ihop. ══ */
+.topnav{transition:opacity .3s ease,transform .4s var(--ease)}
+.topnav.nav-dold{opacity:0;transform:translateY(-14px);pointer-events:none}
+@media (prefers-reduced-motion:reduce){
+  .topnav{transition:opacity .01s linear}
+  .topnav.nav-dold{transform:none}
+}
 </style>
 </head>
 <body>
@@ -2317,15 +2327,48 @@ const LEGAL = {
 </script>
 
 <script>
-/* vebbit-nav-mobil: solid bakgrund nar sidan scrollats */
+/* vebbit-nav-doljs-vid-scroll: menyn ar genomskinlig och lag kvar over
+   innehallet, sa rubriker skar rakt genom den. Nu tonar den bort nar man
+   scrollar ner och kommer tillbaka sa fort man scrollar upp.
+   Ersatter det gamla .solid-skriptet, som var dott: regeln .topnav.solid
+   togs bort tidigare (den gav en hard kant mot fotot). */
 (function(){
   var n=document.querySelector('.topnav'); if(!n) return;
-  var senast=null;
-  function pos(){return window.scrollY||document.documentElement.scrollTop||document.body.scrollTop||0;}
-  function uppdatera(){var pa=pos()>24; if(pa!==senast){senast=pa; n.classList.toggle('solid',pa);}}
+
+  /* 🚨 fy-down animerar bade opacity och transform med fill-mode "both" och
+     pinnar darfor opacity:1 + transform:none efter sig. Animationer slar
+     vanliga klassregler i kaskaden, sa .nav-dold hade varit verkningslos.
+     Nolla animationen nar den spelat klart — da far klassen rada. */
+  function slappAnimationen(){ n.style.animation='none'; }
+  n.addEventListener('animationend', slappAnimationen, {once:true});
+  setTimeout(slappAnimationen, 1400);   /* .2s delay + .8s speltid, med marginal */
+
+  function pos(){ return window.scrollY||document.documentElement.scrollTop||document.body.scrollTop||0; }
+  var sist=pos();
+  var TROSKEL=90;   /* nara toppen ska menyn alltid finnas kvar */
+  var DARR=6;       /* ignorera skakningar och studsen i slutet av en scroll */
+
+  function uppdatera(){
+    var y=pos();
+    /* bestallningsmodalen laser sidan, och en tangentbordsanvandare som
+       tabbat in i menyn ska aldrig tappa bort den under fingrarna */
+    if(document.body.style.overflow==='hidden' || n.contains(document.activeElement)){
+      n.classList.remove('nav-dold'); sist=y; return;
+    }
+    var d=y-sist;
+    if(Math.abs(d)<DARR) return;
+    if(d>0 && y>TROSKEL) n.classList.add('nav-dold');
+    else if(d<0) n.classList.remove('nav-dold');
+    sist=y;
+  }
+  /* Rak lyssnare, ingen requestAnimationFrame: arbetet ar tva lasningar och
+     ett klassbyte, och webblasaren slar anda ihop scroll-handelser per
+     bildruta. rAF hade dessutom gjort menyn helt passiv i sammanhang dar
+     dokumentet rapporteras dolt (t.ex. forhandsvisnings-iframes). */
   addEventListener('scroll',uppdatera,{passive:true});
-  addEventListener('hashchange',function(){setTimeout(uppdatera,60);});
-  uppdatera();
+  /* routern scrollar till toppen vid sidbyte — menyn ska alltid mota dig dar */
+  addEventListener('hashchange',function(){ n.classList.remove('nav-dold'); sist=0; });
+  n.addEventListener('focusin',function(){ n.classList.remove('nav-dold'); });
 })();
 </script>
 <script>
