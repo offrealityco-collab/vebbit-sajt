@@ -1198,6 +1198,14 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
   .co-chip button{width:22px;height:22px}
   .co-x{width:42px;height:42px}
 }
+
+/* ══ webbit-fyren-mobil: fyren stod pa x=0,75 av fotot och beskars bort vid
+   390px, medan strallskriptet redan ritade lampan vid 72%. CSS:en saknade
+   mobilregeln — nu foljer fotot skriptet. Brytpunkten ar 720px for att matcha
+   mobileLayout i skriptet exakt; med 760 hade de varit osams mellan 721-760. ══ */
+@media (max-width:720px){
+  .lh-hero{background-position:72% center}
+}
 </style>
 </head>
 <body>
