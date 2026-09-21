@@ -2367,6 +2367,12 @@ const LEGAL = {
   setTimeout(slappAnimationen, 1400);   /* .2s delay + .8s speltid, med marginal */
 
   function pos(){ return window.scrollY||document.documentElement.scrollTop||document.body.scrollTop||0; }
+  /* Faller tillbaka pa contains() om :focus-visible saknas — da ar
+     tillgangligheten viktigare an att menyn doljs. */
+  function tangentbordsfokus(){
+    try{ return !!n.querySelector(':focus-visible'); }
+    catch(e){ return n.contains(document.activeElement); }
+  }
   var sist=pos();
   var TROSKEL=90;   /* nara toppen ska menyn alltid finnas kvar */
   var DARR=6;       /* ignorera skakningar och studsen i slutet av en scroll */
@@ -2374,8 +2380,12 @@ const LEGAL = {
   function uppdatera(){
     var y=pos();
     /* bestallningsmodalen laser sidan, och en tangentbordsanvandare som
-       tabbat in i menyn ska aldrig tappa bort den under fingrarna */
-    if(document.body.style.overflow==='hidden' || n.contains(document.activeElement)){
+       tabbat in i menyn ska aldrig tappa bort den under fingrarna.
+       🚨 :focus-visible, INTE contains(activeElement): en tryckning pa en
+       menylank fokuserar ocksa lanken, sa den gamla varianten holl menyn
+       kvar efter varje sidbyte tills man trycke nagon annanstans pa
+       skarmen. :focus-visible matchar bara tangentbordsfokus. */
+    if(document.body.style.overflow==='hidden' || tangentbordsfokus()){
       n.classList.remove('nav-dold'); sist=y; return;
     }
     var d=y-sist;
@@ -2389,9 +2399,15 @@ const LEGAL = {
      bildruta. rAF hade dessutom gjort menyn helt passiv i sammanhang dar
      dokumentet rapporteras dolt (t.ex. forhandsvisnings-iframes). */
   addEventListener('scroll',uppdatera,{passive:true});
-  /* routern scrollar till toppen vid sidbyte — menyn ska alltid mota dig dar */
-  addEventListener('hashchange',function(){ n.classList.remove('nav-dold'); sist=0; });
-  n.addEventListener('focusin',function(){ n.classList.remove('nav-dold'); });
+  /* Routern scrollar till toppen vid sidbyte — menyn ska alltid mota dig dar.
+     Lankklick gar via history.pushState, som INTE ger nagon hashchange, sa vi
+     lyssnar pa sidlankarna ocksa. */
+  function nollstall(){ n.classList.remove('nav-dold'); sist=0; }
+  addEventListener('hashchange',nollstall);
+  document.querySelectorAll('a[data-page]').forEach(function(a){
+    a.addEventListener('click',function(){ setTimeout(nollstall,0); });
+  });
+  n.addEventListener('focusin',function(){ if(tangentbordsfokus()) n.classList.remove('nav-dold'); });
 })();
 </script>
 <script>
