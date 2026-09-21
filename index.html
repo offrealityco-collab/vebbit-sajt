@@ -1206,6 +1206,17 @@ h1{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0}
 @media (max-width:720px){
   .lh-hero{background-position:72% center}
 }
+
+/* ══ webbit-referensbakgrund-mobil: vid 390px syns bara 38% av bildbredden
+   och `center` gav fonstret 0,309-0,691 — Saturnus klistrad i vansterkanten
+   och manen (0,758-0,897) helt utanfor. 26% centrerar Saturnus.
+   Medvetet Saturnus och inte manen: hjalten ovanfor visar redan en stor
+   mane, och manen hade blivit 142px bred rakt bakom citattexten.
+   Over ~975px bredd ar hela bilden synlig och position-x saknar verkan, sa
+   desktop och next-row-kalibreringen (aktiv forst over 981px) ar oberorda. ══ */
+@media (max-width:760px){
+  .ku-obs{background-position:26% top}
+}
 </style>
 </head>
 <body>
