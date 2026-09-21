@@ -463,7 +463,6 @@ a:hover{color:var(--gold-light)}
   display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.78rem;color:rgba(234,243,245,.4)}
 @media (max-width:760px){
   .caps__diag{min-height:0;display:flex;flex-direction:column;gap:2.6rem}
-  .caps__comet{display:none}
   .dcap{position:static}
   .dcap__ord{opacity:1!important;color:rgba(231,190,90,.72)!important}
   .dcap__info{position:static;opacity:1;transform:none;margin-top:1rem;width:auto}
@@ -1611,12 +1610,18 @@ const LEGAL = {
        da uppat, och klam som sista skydd. */
     var mag=Math.min(160,dist*0.26), sgn=(dy>0?1:-1), pad=36;
     function ctrl(s){ return {x:a.x+dx*0.5-(dy/dist)*mag*s, y:a.y+dy*0.5+(dx/dist)*mag*s}; }
+    /* 🚨 Klampa i BADA led. Forut vaktades bara hojden, for pa desktop ligger
+       korten pa en diagonal och bagen buktar mest lodratt. Pa mobil star de i
+       en lodrat kolumn och da buktar bagen i SIDLED — upp till 160px ut fran
+       en 351px bred duk, sa kometen forsvann utanfor kanten. */
+    function utanfor(p){ return p.y>h-pad || p.y<pad || p.x>w-pad || p.x<pad; }
     var c=ctrl(sgn);
-    if(c.y>h-pad || c.y<pad){
+    if(utanfor(c)){
       var alt=ctrl(-sgn);
-      if(alt.y<=h-pad && alt.y>=pad) c=alt;
+      if(!utanfor(alt)) c=alt;
     }
     c.y=Math.max(pad,Math.min(h-pad,c.y));
+    c.x=Math.max(pad,Math.min(w-pad,c.x));
     var cx=c.x, cy=c.y;
     function at_(t){ var u=1-t; return {x:u*u*a.x+2*u*t*cx+t*t*b.x, y:u*u*a.y+2*u*t*cy+t*t*b.y}; }
     var dur=420+Math.min(190,dist*0.14), t0=performance.now(), myGen=++gen, arrived=false;
